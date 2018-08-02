@@ -1,4 +1,5 @@
 # storage-timeline-client.py
+import ssl
 import json
 import urllib.request
 
@@ -10,6 +11,9 @@ class TimeLine:
         self.name = name
         
     def allStrings(self):
+        sslContext = ssl.create_default_context();
+        sslContext.check_hostname = False
+        sslContext.verify_mode = ssl.CERT_NONE
         uriString = self.schema.storage.uri + 'timeline/all/strings?schema=' + self.schema.name + '&timeLine=' + self.name
         with urllib.request.urlopen(uriString, context = sslContext) as url:
             data = json.loads(url.read().decode())
