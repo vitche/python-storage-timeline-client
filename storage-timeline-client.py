@@ -26,6 +26,15 @@ class Schema:
         self.storage = storage
         self.name = name
         
+    def list(self):
+        sslContext = ssl.create_default_context();
+        sslContext.check_hostname = False
+        sslContext.verify_mode = ssl.CERT_NONE
+        uriString = self.storage.uri + 'schema/list?schema=' + self.name
+        with urllib.request.urlopen(uriString, context = sslContext) as url:
+            data = json.loads(url.read().decode())
+            return data
+        
     def timeLine(self, name):
         return TimeLine(self, name);
     
