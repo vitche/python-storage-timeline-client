@@ -5,5 +5,6 @@ setup (
    version='1.0',
    description='Python Storage.Timeline client',
    author='Vitche Research Team Developer',
-   author_email='developer@vitche.com'
+   author_email='developer@vitche.com',
+   packages=['storage_timeline_client']
 )
