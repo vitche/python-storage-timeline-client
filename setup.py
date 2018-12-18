@@ -7,5 +7,5 @@ setup (
    author = 'Vitche Research Team Developer',
    author_email = 'developer@vitche.com',
    py_modules = ['storage_timeline_client'],
-   install_requires = ['json', 'urllib']
+   install_requires = ['urllib']
 )
