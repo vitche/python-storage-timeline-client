@@ -69,9 +69,8 @@ class TimeLine:
         response = urllib.request.urlopen(request, context=ssl_context)
         return response.read()
 
-    # Represents a schema instance reference
 
-
+# Represents a schema instance reference
 class Schema:
 
     def __init__(self, storage, name):
