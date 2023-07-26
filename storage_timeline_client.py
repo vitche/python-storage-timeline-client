@@ -41,6 +41,26 @@ class TimeLine:
             data = json.loads(url.read().decode())
             return data
 
+    def all_documents(self):
+        ssl_context = ssl.create_default_context()
+        ssl_context.check_hostname = False
+        ssl_context.verify_mode = ssl.CERT_NONE
+        if is_v2_api(self.schema.storage.uri):
+            uri_string = f"{self.schema.storage.uri}?format=string&schema={self.schema.name}&timeLine={self.name}"
+        else:
+            uri_string = self.schema.storage.uri + 'timeline/all/strings?schema=' + self.schema.name + '&timeLine='
+            uri_string += self.name
+
+        with urllib.request.urlopen(uri_string, context=ssl_context) as url:
+
+            data = json.loads(url.read().decode())
+
+            # Parse JSON documents
+            for item in data:
+                item["value"] = json.loads(item["value"])
+
+            return data
+
     def add_number(self, value):
         ssl_context = ssl.create_default_context()
         ssl_context.check_hostname = False
