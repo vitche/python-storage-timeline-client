@@ -2,7 +2,7 @@ from setuptools import setup
 
 setup(
     name='storage_timeline_client',
-    version='1.2',
+    version='1.3',
     description='Python Storage.Timeline client',
     author='Vitche Research Team Developer',
     author_email='developer@vitche.com',
