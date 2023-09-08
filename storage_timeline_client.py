@@ -57,9 +57,13 @@ class TimeLine:
 
             # Parse JSON documents
             for item in data:
-                item["value"] = json.loads(item["value"])
+                try:
+                    item["value"] = json.loads(item["value"])
+                except:
+                    item["value"] = None
 
             return data
+
 
     def add_number(self, value):
         ssl_context = ssl.create_default_context()
