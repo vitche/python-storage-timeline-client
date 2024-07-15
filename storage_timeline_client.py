@@ -64,32 +64,37 @@ class TimeLine:
 
             return data
 
-
-    def add_number(self, value):
+    def add_number(self, value, time=None):
         ssl_context = ssl.create_default_context()
         ssl_context.check_hostname = False
         ssl_context.verify_mode = ssl.CERT_NONE
         uri_string = self.schema.storage.uri + 'timeline/add/number'
-        data = urllib.parse.urlencode({
+        data = {
             "schema": self.schema.name,
             "timeLine": self.name,
             "value": value
-        }).encode()
-        request = urllib.request.Request(uri_string, data=data)
+        }
+        if time is not None:
+            data["time"] = time
+        encoded_data = urllib.parse.urlencode(data).encode()
+        request = urllib.request.Request(uri_string, data=encoded_data)
         response = urllib.request.urlopen(request, context=ssl_context)
         return response.read()
 
-    def add_string(self, value):
+    def add_string(self, value, time=None):
         ssl_context = ssl.create_default_context()
         ssl_context.check_hostname = False
         ssl_context.verify_mode = ssl.CERT_NONE
         uri_string = self.schema.storage.uri + 'timeline/add/string'
-        data = urllib.parse.urlencode({
+        data = {
             "schema": self.schema.name,
             "timeLine": self.name,
             "value": value
-        }).encode()
-        request = urllib.request.Request(uri_string, data=data)
+        }
+        if time is not None:
+            data["time"] = time
+        encoded_data = urllib.parse.urlencode(data).encode()
+        request = urllib.request.Request(uri_string, data=encoded_data)
         response = urllib.request.urlopen(request, context=ssl_context)
         return response.read()
 
