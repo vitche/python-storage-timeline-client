@@ -127,3 +127,12 @@ class Storage:
 
     def schema(self, name):
         return Schema(self, name)
+
+    def list(self):
+        ssl_context = ssl.create_default_context()
+        ssl_context.check_hostname = False
+        ssl_context.verify_mode = ssl.CERT_NONE
+        uri_string = self.uri + 'storage/list'
+        with urllib.request.urlopen(uri_string, context=ssl_context) as url:
+            data = json.loads(url.read().decode())
+            return data
