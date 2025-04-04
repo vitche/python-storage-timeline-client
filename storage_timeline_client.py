@@ -4,10 +4,6 @@ import urllib.parse
 import urllib.request
 
 
-def is_v2_api(value):
-    return "cloudfunctions.net" in value
-
-
 # Represents a time-line instance reference
 class TimeLine:
 
@@ -19,12 +15,13 @@ class TimeLine:
         ssl_context = ssl.create_default_context()
         ssl_context.check_hostname = False
         ssl_context.verify_mode = ssl.CERT_NONE
-        if is_v2_api(self.schema.storage.uri):
-            uri_string = f"{self.schema.storage.uri}?format=number&schema={self.schema.name}&timeLine={self.name}"
-        else:
-            uri_string = self.schema.storage.uri + 'timeline/all/numbers?schema=' + self.schema.name + '&timeLine='
-            uri_string += self.name
-        with urllib.request.urlopen(uri_string, context=ssl_context) as url:
+
+        uri_string = f"{self.schema.storage.uri}/timeline/all/numbers?schema={self.schema.name}&timeLine={self.name}"
+
+        request = urllib.request.Request(uri_string)
+        request.add_header('Content-Type', 'application/storage-timeline')
+
+        with urllib.request.urlopen(request, context=ssl_context) as url:
             data = json.loads(url.read().decode())
             return data
 
@@ -32,12 +29,13 @@ class TimeLine:
         ssl_context = ssl.create_default_context()
         ssl_context.check_hostname = False
         ssl_context.verify_mode = ssl.CERT_NONE
-        if is_v2_api(self.schema.storage.uri):
-            uri_string = f"{self.schema.storage.uri}?format=string&schema={self.schema.name}&timeLine={self.name}"
-        else:
-            uri_string = self.schema.storage.uri + 'timeline/all/strings?schema=' + self.schema.name + '&timeLine='
-            uri_string += self.name
-        with urllib.request.urlopen(uri_string, context=ssl_context) as url:
+
+        uri_string = f"{self.schema.storage.uri}/timeline/all/strings?schema={self.schema.name}&timeLine={self.name}"
+
+        request = urllib.request.Request(uri_string)
+        request.add_header('Content-Type', 'application/storage-timeline')
+
+        with urllib.request.urlopen(request, context=ssl_context) as url:
             data = json.loads(url.read().decode())
             return data
 
@@ -45,14 +43,13 @@ class TimeLine:
         ssl_context = ssl.create_default_context()
         ssl_context.check_hostname = False
         ssl_context.verify_mode = ssl.CERT_NONE
-        if is_v2_api(self.schema.storage.uri):
-            uri_string = f"{self.schema.storage.uri}?format=string&schema={self.schema.name}&timeLine={self.name}"
-        else:
-            uri_string = self.schema.storage.uri + 'timeline/all/strings?schema=' + self.schema.name + '&timeLine='
-            uri_string += self.name
 
-        with urllib.request.urlopen(uri_string, context=ssl_context) as url:
+        uri_string = f"{self.schema.storage.uri}/timeline/all/strings?schema={self.schema.name}&timeLine={self.name}"
 
+        request = urllib.request.Request(uri_string)
+        request.add_header('Content-Type', 'application/storage-timeline')
+
+        with urllib.request.urlopen(request, context=ssl_context) as url:
             data = json.loads(url.read().decode())
 
             # Parse JSON documents
@@ -68,7 +65,9 @@ class TimeLine:
         ssl_context = ssl.create_default_context()
         ssl_context.check_hostname = False
         ssl_context.verify_mode = ssl.CERT_NONE
-        uri_string = self.schema.storage.uri + 'timeline/add/number'
+
+        uri_string = f"{self.schema.storage.uri}/timeline/add/number"
+
         data = {
             "schema": self.schema.name,
             "timeLine": self.name,
@@ -76,8 +75,12 @@ class TimeLine:
         }
         if time is not None:
             data["time"] = time
+
         encoded_data = urllib.parse.urlencode(data).encode()
+
         request = urllib.request.Request(uri_string, data=encoded_data)
+        request.add_header('Content-Type', 'application/storage-timeline')
+
         response = urllib.request.urlopen(request, context=ssl_context)
         return response.read()
 
@@ -85,7 +88,9 @@ class TimeLine:
         ssl_context = ssl.create_default_context()
         ssl_context.check_hostname = False
         ssl_context.verify_mode = ssl.CERT_NONE
-        uri_string = self.schema.storage.uri + 'timeline/add/string'
+
+        uri_string = f"{self.schema.storage.uri}/timeline/add/string"
+
         data = {
             "schema": self.schema.name,
             "timeLine": self.name,
@@ -93,8 +98,12 @@ class TimeLine:
         }
         if time is not None:
             data["time"] = time
+
         encoded_data = urllib.parse.urlencode(data).encode()
+
         request = urllib.request.Request(uri_string, data=encoded_data)
+        request.add_header('Content-Type', 'application/storage-timeline')
+
         response = urllib.request.urlopen(request, context=ssl_context)
         return response.read()
 
@@ -110,8 +119,13 @@ class Schema:
         ssl_context = ssl.create_default_context()
         ssl_context.check_hostname = False
         ssl_context.verify_mode = ssl.CERT_NONE
-        uri_string = self.storage.uri + 'schema/list?schema=' + self.name
-        with urllib.request.urlopen(uri_string, context=ssl_context) as url:
+
+        uri_string = f"{self.storage.uri}/schema/list?schema={self.name}"
+
+        request = urllib.request.Request(uri_string)
+        request.add_header('Content-Type', 'application/storage-timeline')
+
+        with urllib.request.urlopen(request, context=ssl_context) as url:
             data = json.loads(url.read().decode())
             return data
 
@@ -123,7 +137,8 @@ class Schema:
 class Storage:
 
     def __init__(self, uri):
-        self.uri = uri
+        # Remove trailing slash if present
+        self.uri = uri.rstrip('/')
 
     def schema(self, name):
         return Schema(self, name)
@@ -132,7 +147,12 @@ class Storage:
         ssl_context = ssl.create_default_context()
         ssl_context.check_hostname = False
         ssl_context.verify_mode = ssl.CERT_NONE
-        uri_string = self.uri + 'storage/list'
-        with urllib.request.urlopen(uri_string, context=ssl_context) as url:
+
+        uri_string = f"{self.uri}/storage/list"
+
+        request = urllib.request.Request(uri_string)
+        request.add_header('Content-Type', 'application/storage-timeline')
+
+        with urllib.request.urlopen(request, context=ssl_context) as url:
             data = json.loads(url.read().decode())
             return data
