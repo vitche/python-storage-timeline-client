@@ -4,22 +4,31 @@ import urllib.parse
 import urllib.request
 
 
+def is_v2_api(value):
+    return "cloudfunctions.net" in value
+
+
 # Represents a time-line instance reference
 class TimeLine:
 
-    def __init__(self, schema, name):
+    def __init__(self, schema, name, binary=False):
         self.schema = schema
         self.name = name
+        self.binary = binary
 
     def all_numbers(self):
         ssl_context = ssl.create_default_context()
         ssl_context.check_hostname = False
         ssl_context.verify_mode = ssl.CERT_NONE
 
-        uri_string = f"{self.schema.storage.uri}/timeline/all/numbers?schema={self.schema.name}&timeLine={self.name}"
+        if is_v2_api(self.schema.storage.uri):
+            uri_string = f"{self.schema.storage.uri}?format=number&schema={self.schema.name}&timeLine={self.name}"
+        else:
+            uri_string = f"{self.schema.storage.uri}/timeline/all/numbers?schema={self.schema.name}&timeLine={self.name}"
 
         request = urllib.request.Request(uri_string)
-        request.add_header('Content-Type', 'application/storage-timeline')
+        if self.binary:
+            request.add_header('Content-Type', 'application/storage-timeline')
 
         with urllib.request.urlopen(request, context=ssl_context) as url:
             data = json.loads(url.read().decode())
@@ -30,10 +39,14 @@ class TimeLine:
         ssl_context.check_hostname = False
         ssl_context.verify_mode = ssl.CERT_NONE
 
-        uri_string = f"{self.schema.storage.uri}/timeline/all/strings?schema={self.schema.name}&timeLine={self.name}"
+        if is_v2_api(self.schema.storage.uri):
+            uri_string = f"{self.schema.storage.uri}?format=string&schema={self.schema.name}&timeLine={self.name}"
+        else:
+            uri_string = f"{self.schema.storage.uri}/timeline/all/strings?schema={self.schema.name}&timeLine={self.name}"
 
         request = urllib.request.Request(uri_string)
-        request.add_header('Content-Type', 'application/storage-timeline')
+        if self.binary:
+            request.add_header('Content-Type', 'application/storage-timeline')
 
         with urllib.request.urlopen(request, context=ssl_context) as url:
             data = json.loads(url.read().decode())
@@ -44,10 +57,14 @@ class TimeLine:
         ssl_context.check_hostname = False
         ssl_context.verify_mode = ssl.CERT_NONE
 
-        uri_string = f"{self.schema.storage.uri}/timeline/all/strings?schema={self.schema.name}&timeLine={self.name}"
+        if is_v2_api(self.schema.storage.uri):
+            uri_string = f"{self.schema.storage.uri}?format=string&schema={self.schema.name}&timeLine={self.name}"
+        else:
+            uri_string = f"{self.schema.storage.uri}/timeline/all/strings?schema={self.schema.name}&timeLine={self.name}"
 
         request = urllib.request.Request(uri_string)
-        request.add_header('Content-Type', 'application/storage-timeline')
+        if self.binary:
+            request.add_header('Content-Type', 'application/storage-timeline')
 
         with urllib.request.urlopen(request, context=ssl_context) as url:
             data = json.loads(url.read().decode())
@@ -66,20 +83,30 @@ class TimeLine:
         ssl_context.check_hostname = False
         ssl_context.verify_mode = ssl.CERT_NONE
 
-        uri_string = f"{self.schema.storage.uri}/timeline/add/number"
+        if is_v2_api(self.schema.storage.uri):
+            uri_string = f"{self.schema.storage.uri}"
+            data = {
+                "format": "number",
+                "schema": self.schema.name,
+                "timeLine": self.name,
+                "value": value
+            }
+        else:
+            uri_string = f"{self.schema.storage.uri}/timeline/add/number"
+            data = {
+                "schema": self.schema.name,
+                "timeLine": self.name,
+                "value": value
+            }
 
-        data = {
-            "schema": self.schema.name,
-            "timeLine": self.name,
-            "value": value
-        }
         if time is not None:
             data["time"] = time
 
         encoded_data = urllib.parse.urlencode(data).encode()
 
         request = urllib.request.Request(uri_string, data=encoded_data)
-        request.add_header('Content-Type', 'application/storage-timeline')
+        if self.binary:
+            request.add_header('Content-Type', 'application/storage-timeline')
 
         response = urllib.request.urlopen(request, context=ssl_context)
         return response.read()
@@ -89,20 +116,30 @@ class TimeLine:
         ssl_context.check_hostname = False
         ssl_context.verify_mode = ssl.CERT_NONE
 
-        uri_string = f"{self.schema.storage.uri}/timeline/add/string"
+        if is_v2_api(self.schema.storage.uri):
+            uri_string = f"{self.schema.storage.uri}"
+            data = {
+                "format": "string",
+                "schema": self.schema.name,
+                "timeLine": self.name,
+                "value": value
+            }
+        else:
+            uri_string = f"{self.schema.storage.uri}/timeline/add/string"
+            data = {
+                "schema": self.schema.name,
+                "timeLine": self.name,
+                "value": value
+            }
 
-        data = {
-            "schema": self.schema.name,
-            "timeLine": self.name,
-            "value": value
-        }
         if time is not None:
             data["time"] = time
 
         encoded_data = urllib.parse.urlencode(data).encode()
 
         request = urllib.request.Request(uri_string, data=encoded_data)
-        request.add_header('Content-Type', 'application/storage-timeline')
+        if self.binary:
+            request.add_header('Content-Type', 'application/storage-timeline')
 
         response = urllib.request.urlopen(request, context=ssl_context)
         return response.read()
@@ -111,47 +148,59 @@ class TimeLine:
 # Represents a schema instance reference
 class Schema:
 
-    def __init__(self, storage, name):
+    def __init__(self, storage, name, binary=False):
         self.storage = storage
         self.name = name
+        self.binary = binary
 
     def list(self):
         ssl_context = ssl.create_default_context()
         ssl_context.check_hostname = False
         ssl_context.verify_mode = ssl.CERT_NONE
 
-        uri_string = f"{self.storage.uri}/schema/list?schema={self.name}"
+        if is_v2_api(self.storage.uri):
+            uri_string = f"{self.storage.uri}?action=schema-list&schema={self.name}"
+        else:
+            uri_string = f"{self.storage.uri}/schema/list?schema={self.name}"
 
         request = urllib.request.Request(uri_string)
-        request.add_header('Content-Type', 'application/storage-timeline')
+        if self.binary:
+            request.add_header('Content-Type', 'application/storage-timeline')
 
         with urllib.request.urlopen(request, context=ssl_context) as url:
             data = json.loads(url.read().decode())
             return data
 
     def time_line(self, name):
-        return TimeLine(self, name)
+        # Use the binary attribute from the Schema instance
+        return TimeLine(self, name, self.binary)
 
 
 # Represents a storage instance reference
 class Storage:
 
-    def __init__(self, uri):
+    def __init__(self, uri, binary=False):
         # Remove trailing slash if present
-        self.uri = uri.rstrip('/')
+        self.uri = uri
+        self.binary = binary
 
     def schema(self, name):
-        return Schema(self, name)
+        # Use the binary attribute from the Storage instance
+        return Schema(self, name, self.binary)
 
     def list(self):
         ssl_context = ssl.create_default_context()
         ssl_context.check_hostname = False
         ssl_context.verify_mode = ssl.CERT_NONE
 
-        uri_string = f"{self.uri}/storage/list"
+        if is_v2_api(self.uri):
+            uri_string = f"{self.uri}?action=storage-list"
+        else:
+            uri_string = f"{self.uri}/storage/list"
 
         request = urllib.request.Request(uri_string)
-        request.add_header('Content-Type', 'application/storage-timeline')
+        if self.binary:
+            request.add_header('Content-Type', 'application/storage-timeline')
 
         with urllib.request.urlopen(request, context=ssl_context) as url:
             data = json.loads(url.read().decode())
