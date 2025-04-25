@@ -1,6 +1,6 @@
 # Python `Storage.Timeline` Client
 
-A Python client library for Vitche's [Storage.Timeline](https://github.com/vitche/wasm_storage_timeline) server.  
+A Python client library for Vitche's [Storage.Timeline](https://github.com/vitche/documentation-storage-timeline) server.  
 This library provides a simple interface to interact with schemas and timelines, supporting addition and retrieval of both string and numeric data entries.
 
 ## Table of Contents
