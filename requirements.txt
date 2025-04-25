@@ -1,2 +1,3 @@
 python-dotenv
 setuptools
+wasm_storage_timeline @ git+https://github.com/vitche/wasm_storage_timeline.git
